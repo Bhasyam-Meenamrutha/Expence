@@ -1,30 +1,93 @@
-import { useState } from 'react';
-import { expence_backend } from 'declarations/expence_backend';
+import React, { useState } from 'react';
+
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+  const [expenses, setExpenses] = useState([]);
+  const [form, setForm] = useState({ amount: '', category: '', date: '' });
+  const [editingIndex, setEditingIndex] = useState(null);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    expence_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editingIndex !== null) {
+      const updatedExpenses = [...expenses];
+      updatedExpenses[editingIndex] = form;
+      setExpenses(updatedExpenses);
+      setEditingIndex(null);
+    } else {
+      setExpenses((prev) => [...prev, form]);
+    }
+    setForm({ amount: '', category: '', date: '' });
+  };
+
+  const handleEdit = (index) => {
+    setForm(expenses[index]);
+    setEditingIndex(index);
+  };
+
+  const handleDelete = (index) => {
+    const updatedExpenses = expenses.filter((_, i) => i !== index);
+    setExpenses(updatedExpenses);
+  };
 
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
+    <div className="expense-tracker">
+      <h1>Expense Tracker</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>
+            Amount:
+            <input
+              type="number"
+              name="amount"
+              value={form.amount}
+              onChange={handleChange}
+              required
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Category:
+            <input
+              type="text"
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              required
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Date:
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              required
+            />
+          </label>
+        </div>
+        <button type="submit">{editingIndex !== null ? 'Update Expense' : 'Add Expense'}</button>
       </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+
+      <h2>Expenses</h2>
+      <ul>
+        {expenses.map((expense, index) => (
+          <li key={index}>
+            <span>{expense.date} - {expense.category} - ${expense.amount}</span>
+            <button onClick={() => handleEdit(index)}>Edit</button>
+            <button onClick={() => handleDelete(index)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
