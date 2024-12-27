@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "expence_backend": {
+      "main": "src/expence_backend/main.mo",
+      "type": "motoko"
+    },
+    "expence_frontend": {
+      "dependencies": [
+        "expence_backend"
+      ],
+      "source": [
+        "src/expence_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "expence_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
